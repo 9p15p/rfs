@@ -52,7 +52,7 @@ class ConvNet(nn.Module):
         out = self.layer4(out)
         f3 = out
         out = self.avgpool(out)
-        out = out.view(out.size(0), -1)
+        out = out.reshape(out.size(0), -1)
         feat = out
 
         if self.num_classes > 0:

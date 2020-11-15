@@ -79,7 +79,7 @@ class Attention(nn.Module):
         return (self.at(f_s) - self.at(f_t)).pow(2).mean()
 
     def at(self, f):
-        return F.normalize(f.pow(self.p).mean(1).view(f.size(0), -1))
+        return F.normalize(f.pow(self.p).mean(1).reshape(f.size(0), -1))
 
 
 class HintLoss(nn.Module):

@@ -23,8 +23,8 @@ class SELayer(nn.Module):
 
     def forward(self, x):
         b, c, _, _ = x.size()
-        y = self.avg_pool(x).view(b, c)
-        y = self.fc(y).view(b, c, 1, 1)
+        y = self.avg_pool(x).reshape(b, c)
+        y = self.fc(y).reshape(b, c, 1, 1)
         return x * y
 
 
@@ -58,12 +58,12 @@ class DropBlock(nn.Module):
         
         batch_size, channels, height, width = mask.shape
         #print ("mask", mask[0][0])
-        non_zero_idxs = mask.nonzero()
+        non_zero_idxs = mask.nonzero(as_tuple=False)
         nr_blocks = non_zero_idxs.shape[0]
 
         offsets = torch.stack(
             [
-                torch.arange(self.block_size).view(-1, 1).expand(self.block_size, self.block_size).reshape(-1), # - left_padding,
+                torch.arange(self.block_size).reshape(-1, 1).expand(self.block_size, self.block_size).reshape(-1), # - left_padding,
                 torch.arange(self.block_size).repeat(self.block_size), #- left_padding
             ]
         ).t().cuda()
@@ -71,7 +71,7 @@ class DropBlock(nn.Module):
         
         if nr_blocks > 0:
             non_zero_idxs = non_zero_idxs.repeat(self.block_size ** 2, 1)
-            offsets = offsets.repeat(nr_blocks, 1).view(-1, 4)
+            offsets = offsets.repeat(nr_blocks, 1).reshape(-1, 4)
             offsets = offsets.long()
 
             block_idxs = non_zero_idxs + offsets
@@ -219,7 +219,7 @@ class ResNet(nn.Module):
         f3 = x
         if self.keep_avg_pool:
             x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
+        x = x.reshape(x.size(0), -1)
         feat = x
         if self.num_classes > 0:
             x = self.classifier(x)

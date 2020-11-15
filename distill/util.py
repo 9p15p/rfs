@@ -11,7 +11,7 @@ class Embed(nn.Module):
         self.l2norm = Normalize(2)
 
     def forward(self, x):
-        x = x.view(x.shape[0], -1)
+        x = x.reshape(x.shape[0], -1)
         x = self.linear(x)
         x = self.l2norm(x)
         return x
@@ -24,7 +24,7 @@ class LinearEmbed(nn.Module):
         self.linear = nn.Linear(dim_in, dim_out)
 
     def forward(self, x):
-        x = x.view(x.shape[0], -1)
+        x = x.reshape(x.shape[0], -1)
         x = self.linear(x)
         return x
 
@@ -39,7 +39,7 @@ class MLPEmbed(nn.Module):
         self.l2norm = Normalize(2)
 
     def forward(self, x):
-        x = x.view(x.shape[0], -1)
+        x = x.reshape(x.shape[0], -1)
         x = self.relu(self.linear1(x))
         x = self.l2norm(self.linear2(x))
         return x

@@ -84,7 +84,7 @@ class Wide_ResNet(nn.Module):
         out = self.layer3(out)
         out = F.relu(self.bn1(out))
         out = F.adaptive_avg_pool2d(out, 1)
-        out = out.view(out.size(0), -1)
+        out = out.reshape(out.size(0), -1)
         feat = out
         if self.num_classes > 0:
             out = self.classifier(out)

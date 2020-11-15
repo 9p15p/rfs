@@ -40,17 +40,17 @@ def meta_test(net, testloader, use_logit=True, is_norm=True, classifier='LR', op
             support_xs = support_xs.cuda()
             query_xs = query_xs.cuda()
             batch_size, _, channel, height, width = support_xs.size()
-            support_xs = support_xs.view(-1, channel, height, width)
-            query_xs = query_xs.view(-1, channel, height, width)
+            support_xs = support_xs.reshape(-1, channel, height, width)
+            query_xs = query_xs.reshape(-1, channel, height, width)
 
             if use_logit:
-                support_features = net(support_xs).view(support_xs.size(0), -1)
-                query_features = net(query_xs).view(query_xs.size(0), -1)
+                support_features = net(support_xs).reshape(support_xs.size(0), -1)
+                query_features = net(query_xs).reshape(query_xs.size(0), -1)
             else:
                 feat_support, _ = net(support_xs, is_feat=True)
-                support_features = feat_support[-1].view(support_xs.size(0), -1)
+                support_features = feat_support[-1].reshape(support_xs.size(0), -1)
                 feat_query, _ = net(query_xs, is_feat=True)
-                query_features = feat_query[-1].view(query_xs.size(0), -1)
+                query_features = feat_query[-1].reshape(query_xs.size(0), -1)
 
             if is_norm:
                 support_features = normalize(support_features)
@@ -59,8 +59,8 @@ def meta_test(net, testloader, use_logit=True, is_norm=True, classifier='LR', op
             support_features = support_features.detach().cpu().numpy()
             query_features = query_features.detach().cpu().numpy()
 
-            support_ys = support_ys.view(-1).numpy()
-            query_ys = query_ys.view(-1).numpy()
+            support_ys = support_ys.reshape(-1).numpy()
+            query_ys = query_ys.reshape(-1).numpy()
 
             #  clf = SVC(gamma='auto', C=0.1)
             if classifier == 'LR':

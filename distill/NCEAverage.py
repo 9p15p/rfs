@@ -33,18 +33,18 @@ class NCESoftmax(nn.Module):
 
         # original score computation
         if idx is None:
-            idx = self.multinomial.draw(batchSize * (self.K + 1)).view(batchSize, -1)
+            idx = self.multinomial.draw(batchSize * (self.K + 1)).reshape(batchSize, -1)
             idx.select(1, 0).copy_(y.data)
         # sample
-        weight_l = torch.index_select(self.memory_l, 0, idx.view(-1)).detach()
-        weight_l = weight_l.view(batchSize, K + 1, inputSize)
-        out_ab = torch.bmm(weight_l, ab.view(batchSize, inputSize, 1))
+        weight_l = torch.index_select(self.memory_l, 0, idx.reshape(-1)).detach()
+        weight_l = weight_l.reshape(batchSize, K + 1, inputSize)
+        out_ab = torch.bmm(weight_l, ab.reshape(batchSize, inputSize, 1))
         # out_ab = torch.exp(torch.div(out_ab, T))
         out_ab = torch.div(out_ab, T)
         # sample
-        weight_ab = torch.index_select(self.memory_ab, 0, idx.view(-1)).detach()
-        weight_ab = weight_ab.view(batchSize, K + 1, inputSize)
-        out_l = torch.bmm(weight_ab, l.view(batchSize, inputSize, 1))
+        weight_ab = torch.index_select(self.memory_ab, 0, idx.reshape(-1)).detach()
+        weight_ab = weight_ab.reshape(batchSize, K + 1, inputSize)
+        out_l = torch.bmm(weight_ab, l.reshape(batchSize, inputSize, 1))
         # out_l = torch.exp(torch.div(out_l, T))
         out_l = torch.div(out_l, T)
 
@@ -68,14 +68,14 @@ class NCESoftmax(nn.Module):
 
         # update memory
         with torch.no_grad():
-            l_pos = torch.index_select(self.memory_l, 0, y.view(-1))
+            l_pos = torch.index_select(self.memory_l, 0, y.reshape(-1))
             l_pos.mul_(momentum)
             l_pos.add_(torch.mul(l, 1 - momentum))
             l_norm = l_pos.pow(2).sum(1, keepdim=True).pow(0.5)
             updated_l = l_pos.div(l_norm)
             self.memory_l.index_copy_(0, y, updated_l)
 
-            ab_pos = torch.index_select(self.memory_ab, 0, y.view(-1))
+            ab_pos = torch.index_select(self.memory_ab, 0, y.reshape(-1))
             ab_pos.mul_(momentum)
             ab_pos.add_(torch.mul(ab, 1 - momentum))
             ab_norm = ab_pos.pow(2).sum(1, keepdim=True).pow(0.5)
@@ -113,17 +113,17 @@ class NCEAverage(nn.Module):
 
         # original score computation
         if idx is None:
-            idx = self.multinomial.draw(batchSize * (self.K + 1)).view(batchSize, -1)
+            idx = self.multinomial.draw(batchSize * (self.K + 1)).reshape(batchSize, -1)
             idx.select(1, 0).copy_(y.data)
         # sample
-        weight_l = torch.index_select(self.memory_l, 0, idx.view(-1)).detach()
-        weight_l = weight_l.view(batchSize, K + 1, inputSize)
-        out_ab = torch.bmm(weight_l, ab.view(batchSize, inputSize, 1))
+        weight_l = torch.index_select(self.memory_l, 0, idx.reshape(-1)).detach()
+        weight_l = weight_l.reshape(batchSize, K + 1, inputSize)
+        out_ab = torch.bmm(weight_l, ab.reshape(batchSize, inputSize, 1))
         out_ab = torch.exp(torch.div(out_ab, T))
         # sample
-        weight_ab = torch.index_select(self.memory_ab, 0, idx.view(-1)).detach()
-        weight_ab = weight_ab.view(batchSize, K + 1, inputSize)
-        out_l = torch.bmm(weight_ab, l.view(batchSize, inputSize, 1))
+        weight_ab = torch.index_select(self.memory_ab, 0, idx.reshape(-1)).detach()
+        weight_ab = weight_ab.reshape(batchSize, K + 1, inputSize)
+        out_l = torch.bmm(weight_ab, l.reshape(batchSize, inputSize, 1))
         out_l = torch.exp(torch.div(out_l, T))
 
         # set Z if haven't been set yet
@@ -142,14 +142,14 @@ class NCEAverage(nn.Module):
 
         # update memory
         with torch.no_grad():
-            l_pos = torch.index_select(self.memory_l, 0, y.view(-1))
+            l_pos = torch.index_select(self.memory_l, 0, y.reshape(-1))
             l_pos.mul_(momentum)
             l_pos.add_(torch.mul(l, 1 - momentum))
             l_norm = l_pos.pow(2).sum(1, keepdim=True).pow(0.5)
             updated_l = l_pos.div(l_norm)
             self.memory_l.index_copy_(0, y, updated_l)
 
-            ab_pos = torch.index_select(self.memory_ab, 0, y.view(-1))
+            ab_pos = torch.index_select(self.memory_ab, 0, y.reshape(-1))
             ab_pos.mul_(momentum)
             ab_pos.add_(torch.mul(ab, 1 - momentum))
             ab_norm = ab_pos.pow(2).sum(1, keepdim=True).pow(0.5)
@@ -191,17 +191,17 @@ class NCEAverageWithZ(nn.Module):
 
         # original score computation
         if idx is None:
-            idx = self.multinomial.draw(batchSize * (self.K + 1)).view(batchSize, -1)
+            idx = self.multinomial.draw(batchSize * (self.K + 1)).reshape(batchSize, -1)
             idx.select(1, 0).copy_(y.data)
         # sample
-        weight_l = torch.index_select(self.memory_l, 0, idx.view(-1)).detach()
-        weight_l = weight_l.view(batchSize, K + 1, inputSize)
-        out_ab = torch.bmm(weight_l, ab.view(batchSize, inputSize, 1))
+        weight_l = torch.index_select(self.memory_l, 0, idx.reshape(-1)).detach()
+        weight_l = weight_l.reshape(batchSize, K + 1, inputSize)
+        out_ab = torch.bmm(weight_l, ab.reshape(batchSize, inputSize, 1))
         out_ab = torch.exp(torch.div(out_ab, T))
         # sample
-        weight_ab = torch.index_select(self.memory_ab, 0, idx.view(-1)).detach()
-        weight_ab = weight_ab.view(batchSize, K + 1, inputSize)
-        out_l = torch.bmm(weight_ab, l.view(batchSize, inputSize, 1))
+        weight_ab = torch.index_select(self.memory_ab, 0, idx.reshape(-1)).detach()
+        weight_ab = weight_ab.reshape(batchSize, K + 1, inputSize)
+        out_l = torch.bmm(weight_ab, l.reshape(batchSize, inputSize, 1))
         out_l = torch.exp(torch.div(out_l, T))
 
         # set Z if haven't been set yet
@@ -220,14 +220,14 @@ class NCEAverageWithZ(nn.Module):
 
         # update memory
         with torch.no_grad():
-            l_pos = torch.index_select(self.memory_l, 0, y.view(-1))
+            l_pos = torch.index_select(self.memory_l, 0, y.reshape(-1))
             l_pos.mul_(momentum)
             l_pos.add_(torch.mul(l, 1 - momentum))
             l_norm = l_pos.pow(2).sum(1, keepdim=True).pow(0.5)
             updated_l = l_pos.div(l_norm)
             self.memory_l.index_copy_(0, y, updated_l)
 
-            ab_pos = torch.index_select(self.memory_ab, 0, y.view(-1))
+            ab_pos = torch.index_select(self.memory_ab, 0, y.reshape(-1))
             ab_pos.mul_(momentum)
             ab_pos.add_(torch.mul(ab, 1 - momentum))
             ab_norm = ab_pos.pow(2).sum(1, keepdim=True).pow(0.5)
@@ -268,7 +268,7 @@ class NCEAverageFull(nn.Module):
         weight_l_2 = weight_l.gather(dim=1, index=idx2)
         weight_l.scatter_(1, idx1, weight_l_2)
         weight_l.scatter_(1, idx2, weight_l_1)
-        out_ab = torch.bmm(weight_l, ab.view(batchSize, inputSize, 1))
+        out_ab = torch.bmm(weight_l, ab.reshape(batchSize, inputSize, 1))
         out_ab = torch.exp(torch.div(out_ab, T))
         # sample
         weight_ab = self.memory_ab.clone().detach().unsqueeze(0).expand(batchSize, outputSize, inputSize)
@@ -276,7 +276,7 @@ class NCEAverageFull(nn.Module):
         weight_ab_2 = weight_ab.gather(dim=1, index=idx2)
         weight_ab.scatter_(1, idx1, weight_ab_2)
         weight_ab.scatter_(1, idx2, weight_ab_1)
-        out_l = torch.bmm(weight_ab, l.view(batchSize, inputSize, 1))
+        out_l = torch.bmm(weight_ab, l.reshape(batchSize, inputSize, 1))
         out_l = torch.exp(torch.div(out_l, T))
 
         # set Z if haven't been set yet
@@ -295,14 +295,14 @@ class NCEAverageFull(nn.Module):
 
         # update memory
         with torch.no_grad():
-            l_pos = torch.index_select(self.memory_l, 0, y.view(-1))
+            l_pos = torch.index_select(self.memory_l, 0, y.reshape(-1))
             l_pos.mul_(momentum)
             l_pos.add_(torch.mul(l, 1 - momentum))
             l_norm = l_pos.pow(2).sum(1, keepdim=True).pow(0.5)
             updated_l = l_pos.div(l_norm)
             self.memory_l.index_copy_(0, y, updated_l)
 
-            ab_pos = torch.index_select(self.memory_ab, 0, y.view(-1))
+            ab_pos = torch.index_select(self.memory_ab, 0, y.reshape(-1))
             ab_pos.mul_(momentum)
             ab_pos.add_(torch.mul(ab, 1 - momentum))
             ab_norm = ab_pos.pow(2).sum(1, keepdim=True).pow(0.5)
@@ -333,26 +333,26 @@ class NCEAverageFullSoftmax(nn.Module):
         # score computation
         # weight_l = self.memory_l.unsqueeze(0).expand(batchSize, outputSize, inputSize).detach()
         weight_l = self.memory_l.clone().unsqueeze(0).expand(batchSize, outputSize, inputSize).detach()
-        out_ab = torch.bmm(weight_l, ab.view(batchSize, inputSize, 1))
+        out_ab = torch.bmm(weight_l, ab.reshape(batchSize, inputSize, 1))
         out_ab = out_ab.div(T)
         out_ab = out_ab.squeeze().contiguous()
 
         # weight_ab = self.memory_ab.unsqueeze(0).expand(batchSize, outputSize, inputSize).detach()
         weight_ab = self.memory_ab.clone().unsqueeze(0).expand(batchSize, outputSize, inputSize).detach()
-        out_l = torch.bmm(weight_ab, l.view(batchSize, inputSize, 1))
+        out_l = torch.bmm(weight_ab, l.reshape(batchSize, inputSize, 1))
         out_l = out_l.div(T)
         out_l = out_l.squeeze().contiguous()
 
         # update memory
         with torch.no_grad():
-            l_pos = torch.index_select(self.memory_l, 0, y.view(-1))
+            l_pos = torch.index_select(self.memory_l, 0, y.reshape(-1))
             l_pos.mul_(momentum)
             l_pos.add_(torch.mul(l, 1 - momentum))
             l_norm = l_pos.pow(2).sum(1, keepdim=True).pow(0.5)
             updated_l = l_pos.div(l_norm)
             self.memory_l.index_copy_(0, y, updated_l)
 
-            ab_pos = torch.index_select(self.memory_ab, 0, y.view(-1))
+            ab_pos = torch.index_select(self.memory_ab, 0, y.reshape(-1))
             ab_pos.mul_(momentum)
             ab_pos.add_(torch.mul(ab, 1 - momentum))
             ab_norm = ab_pos.pow(2).sum(1, keepdim=True).pow(0.5)
@@ -365,14 +365,14 @@ class NCEAverageFullSoftmax(nn.Module):
         momentum = self.params[1].item()
         # update memory
         with torch.no_grad():
-            l_pos = torch.index_select(self.memory_l, 0, y.view(-1))
+            l_pos = torch.index_select(self.memory_l, 0, y.reshape(-1))
             l_pos.mul_(momentum)
             l_pos.add_(torch.mul(l, 1 - momentum))
             l_norm = l_pos.pow(2).sum(1, keepdim=True).pow(0.5)
             updated_l = l_pos.div(l_norm)
             self.memory_l.index_copy_(0, y, updated_l)
 
-            ab_pos = torch.index_select(self.memory_ab, 0, y.view(-1))
+            ab_pos = torch.index_select(self.memory_ab, 0, y.reshape(-1))
             ab_pos.mul_(momentum)
             ab_pos.add_(torch.mul(ab, 1 - momentum))
             ab_norm = ab_pos.pow(2).sum(1, keepdim=True).pow(0.5)

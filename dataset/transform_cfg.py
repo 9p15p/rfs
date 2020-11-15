@@ -16,7 +16,7 @@ transform_A = [
         transforms.RandomCrop(84, padding=8),
         transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4),
         transforms.RandomHorizontalFlip(),
-        lambda x: np.asarray(x),
+        # lambda x: np.asarray(x),
         transforms.ToTensor(),
         normalize
     ]),

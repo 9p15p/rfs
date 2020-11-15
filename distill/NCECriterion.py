@@ -31,7 +31,7 @@ class NCECriterion(nn.Module):
         lnPon.log_()
 
         lnPmtsum = lnPmt.sum(0)
-        lnPonsum = lnPon.view(-1, 1).sum(0)
+        lnPonsum = lnPon.reshape(-1, 1).sum(0)
 
         loss = - (lnPmtsum + lnPonsum) / batchSize
 

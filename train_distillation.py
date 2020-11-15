@@ -18,7 +18,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 
 from models import model_pool
-from models.util import create_model, get_teacher_name
+from models.util import create_model, get_teacher_name,load_teacher
 
 from distill.util import Embed
 from distill.criterion import DistillKL, NCELoss, Attention, HintLoss
@@ -148,17 +148,6 @@ def parse_option():
         os.makedirs(opt.save_folder)
 
     return opt
-
-
-def load_teacher(model_path, n_cls, dataset='miniImageNet'):
-    """load the teacher model"""
-    print('==> loading teacher model')
-    model_t = get_teacher_name(model_path)
-    model = create_model(model_t, n_cls, dataset)
-    model.load_state_dict(torch.load(model_path)['model'])
-    print('==> done')
-    return model
-
 
 def main():
     best_acc = 0

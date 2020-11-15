@@ -2,7 +2,16 @@ from __future__ import print_function
 
 
 from . import model_dict
+import torch
 
+def load_teacher(model_path, n_cls, dataset='miniImageNet'):
+    """load the teacher model"""
+    print('==> loading teacher model')
+    model_t = get_teacher_name(model_path)
+    model = create_model(model_t, n_cls, dataset)
+    model.load_state_dict(torch.load(model_path)['model'])
+    print('==> done')
+    return model
 
 def create_model(name, n_cls, dataset='miniImageNet'):
     """create model by name"""

@@ -14,7 +14,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 
 from models import model_pool
-from models.util import create_model
+from models.util import create_model,load_teacher
 
 from dataset.mini_imagenet import ImageNet, MetaImageNet
 from dataset.tiered_imagenet import TieredImageNet, MetaTieredImageNet
@@ -37,6 +37,7 @@ def parse_option():
     parser.add_argument('--batch_size', type=int, default=64, help='batch_size')
     parser.add_argument('--num_workers', type=int, default=8, help='num of workers to use')
     parser.add_argument('--epochs', type=int, default=100, help='number of training epochs')
+    parser.add_argument('--load_latest', type=bool, default=False, help='load latest ckpt')
 
     # optimization
     parser.add_argument('--learning_rate', type=float, default=0.05, help='learning rate')
@@ -207,7 +208,11 @@ def main():
         raise NotImplementedError(opt.dataset)
 
     # model
-    model = create_model(opt.model, n_cls, opt.dataset)
+    if not opt.load_latest:
+        model = create_model(opt.model, n_cls, opt.dataset)
+    else:
+        latest_file = os.path.join(opt.save_folder, 'latest.pth')
+        model = load_teacher(latest_file, n_cls, opt.dataset)
 
     # optimizer
     if opt.adam:
@@ -269,6 +274,8 @@ def main():
             }
             save_file = os.path.join(opt.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
             torch.save(state, save_file)
+            latest_file = os.path.join(opt.save_folder, 'latest.pth')
+            os.symlink(save_file,latest_file)
 
     # save the last model
     state = {

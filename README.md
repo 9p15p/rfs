@@ -16,7 +16,7 @@ If you find this repo useful for your research, please consider citing the paper
 
 ## Installation
 
-This repo was tested with Ubuntu 16.04.5 LTS, Python 3.5, PyTorch 0.4.0, and CUDA 9.0. However, it should be compatible with recent PyTorch versions >=0.4.0
+This repo was tested with Ubuntu 18.04 LTS, Python 3.7.9, PyTorch 1.7.0, and CUDA 11.0. However, it should be compatible with recent PyTorch versions >=0.4.0
 
 ## Download Data
 The data we used here is preprocessed by the repo of [MetaOptNet](https://github.com/kjunelee/MetaOptNet), but we have
